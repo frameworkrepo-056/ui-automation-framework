@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <Appenders>
+
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss} [%t] %-5level %c{1} - %msg%n"/>
+        </Console>
+
+        <!--
+     RollingRandomAccessFile is lock-free and safe for parallel writes.
+     Plain <File> uses a synchronized lock — a bottleneck under multiple threads.
+     [Thread-%t] in the pattern lets you trace which thread ran which scenario.
+ -->
+        <RollingRandomAccessFile name="FileLogger"
+                                 fileName="target/logs/automation.log"
+                                 filePattern="target/logs/automation-%d{yyyy-MM-dd}-%i.log.gz"
+                                 append="true">
+            <PatternLayout
+                    pattern="%d{yyyy-MM-dd HH:mm:ss} [Thread-%t] %-5level %c{1} - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <!-- Framework Logging -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>

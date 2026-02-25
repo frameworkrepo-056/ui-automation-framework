@@ -1,0 +1,8 @@
+{
+  "name": "Local Maven Execution",
+  "type": "maven",
+  "buildName": "UI Automation Framework",
+  "buildUrl": "http://localhost",
+  "reportUrl": "http://localhost",
+  "buildOrder": 1
+}
