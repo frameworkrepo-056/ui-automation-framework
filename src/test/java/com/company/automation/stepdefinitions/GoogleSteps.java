@@ -14,13 +14,13 @@ public class GoogleSteps {
     public void openGoogleHomepage() {
         System.out.println("Base URL: " + ConfigReader.get("base.url"));
         googlePage.open(ConfigReader.get("base.url"));
-
-        String actualTitle = DriverManager.getDriver().getTitle();
-
-        Assertions.assertEquals(
-                "Some Wrong Title",
-                actualTitle,
-                "Intentional mismatch to verify Allure reporting"
-        );
+//
+//        String actualTitle = DriverManager.getDriver().getTitle();
+//
+//        Assertions.assertEquals(
+//                "Some Wrong Title",
+//                actualTitle,
+//                "Intentional mismatch to verify Allure reporting"
+//        );
     }
 }

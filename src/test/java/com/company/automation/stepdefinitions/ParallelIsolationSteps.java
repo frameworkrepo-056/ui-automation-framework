@@ -1,6 +1,7 @@
 package com.company.automation.stepdefinitions;
 
 import com.company.automation.driver.DriverManager;
+import com.company.automation.utils.WaitUtils;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.junit.jupiter.api.Assertions;
@@ -14,6 +15,9 @@ public class ParallelIsolationSteps {
 
     @Then("the page title should contain {string}")
     public void pageTitleShouldContain(String expected) {
+        // Uses WaitUtils — consistent with rest of the framework
+        WaitUtils.waitForTitleContains(DriverManager.getDriver(), expected);
+        
         String actualTitle = DriverManager.getDriver().getTitle();
         System.out.printf(
                 "[TITLE CHECK] Thread: %s | Expected: %s | Actual: %s%n",

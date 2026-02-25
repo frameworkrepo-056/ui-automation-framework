@@ -55,13 +55,17 @@ pipeline {
                         ? "-Dcucumber.filter.tags=\"${params.TAGS}\""
                         : ''
 
-                    bat """
-                        mvn test ^
-                            -Dbrowser=${params.BROWSER} ^
-                            -Dheadless=${params.HEADLESS} ^
-                            -Dparallel.threads=${params.THREADS} ^
-                            ${tagFilter}
-                    """
+                    // catchError allows pipeline to continue to report stages
+                    // even when tests fail — build still marked UNSTABLE not SUCCESS
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                        bat """
+                            mvn test ^
+                                -Dbrowser=${params.BROWSER} ^
+                                -Dheadless=${params.HEADLESS} ^
+                                -Dparallel.threads=${params.THREADS} ^
+                                ${tagFilter}
+                        """
+                    }
                 }
             }
         }
@@ -77,26 +81,22 @@ pipeline {
             steps {
                 echo "Archiving reports..."
 
-                // Allure Jenkins Plugin — renders interactive report in Jenkins UI
                 allure([
                     includeProperties: true,
                     jdk: '',
                     results: [[path: 'target/allure-results']]
                 ])
 
-                // Zip the HTML report using Windows PowerShell
                 bat """
                     powershell -Command "Compress-Archive -Path target\\allure-report\\* -DestinationPath target\\allure-report-${BUILD_NUMBER}.zip -Force"
                 """
 
-                // Archive the zip as a downloadable artifact
                 archiveArtifacts(
                     artifacts: "target/allure-report-${BUILD_NUMBER}.zip",
                     fingerprint: true,
                     allowEmptyArchive: false
                 )
 
-                // Archive logs
                 archiveArtifacts(
                     artifacts: 'target/logs/*.log',
                     fingerprint: true,
@@ -107,21 +107,16 @@ pipeline {
     }
 
     post {
-
         success {
             echo "✅ BUILD SUCCESS — All tests passed"
         }
-
-        failure {
-            echo "❌ BUILD FAILED — Check Allure report for failures"
-        }
-
         unstable {
-            echo "⚠️ BUILD UNSTABLE — Some tests failed"
+            echo "⚠️ BUILD UNSTABLE — Some tests failed — check Allure report"
         }
-
+        failure {
+            echo "❌ BUILD FAILED — Pipeline error (not test failure)"
+        }
         always {
-            // cleanWs must be inside node context — agent any provides it
             node('built-in') {
                 cleanWs(
                     cleanWhenSuccess: false,
