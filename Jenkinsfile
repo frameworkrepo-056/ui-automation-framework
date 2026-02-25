@@ -87,15 +87,15 @@ pipeline {
                     results: [[path: 'target/allure-results']]
                 ])
 
-                bat """
-                    powershell -Command "Compress-Archive -Path target\\allure-report\\* -DestinationPath target\\allure-report-${BUILD_NUMBER}.zip -Force"
-                """
+               bat """
+                   powershell -Command "Compress-Archive -Path allure-report\\* -DestinationPath allure-report-${BUILD_NUMBER}.zip -Force"
+               """
 
-                archiveArtifacts(
-                    artifacts: "target/allure-report-${BUILD_NUMBER}.zip",
-                    fingerprint: true,
-                    allowEmptyArchive: false
-                )
+               archiveArtifacts(
+                   artifacts: "allure-report-${BUILD_NUMBER}.zip",
+                   fingerprint: true,
+                   allowEmptyArchive: false
+               )
 
                 archiveArtifacts(
                     artifacts: 'target/logs/*.log',
