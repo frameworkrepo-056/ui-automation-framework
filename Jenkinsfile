@@ -8,6 +8,11 @@ pipeline {
     }
 
     parameters {
+     choice(
+            name: 'ENV',
+            choices: ['dev', 'staging', 'uat', 'prod'],
+            description: 'Target environment'
+        )
         choice(
             name: 'BROWSER',
             choices: ['chrome', 'firefox', 'edge'],
@@ -40,6 +45,22 @@ pipeline {
             }
         }
 
+        stage('Validate') {
+            steps {
+                script {
+                    // Safety guard — block full suite against prod
+                    if (params.ENV == 'prod' && params.TAGS?.trim() == '') {
+                        error("❌ BLOCKED: Full suite against PROD not allowed. " +
+                              "Set TAGS to @smoke or another filter.")
+                    }
+                    echo "✅ Environment : ${params.ENV.toUpperCase()}"
+                    echo "✅ Tags        : ${params.TAGS ?: '(all)'}"
+                    echo "✅ Threads     : ${params.THREADS}"
+                    echo "✅ Headless    : ${params.HEADLESS}"
+                }
+            }
+        }
+
         stage('Build') {
             steps {
                 echo "Compiling project..."
@@ -58,13 +79,14 @@ pipeline {
                     // catchError allows pipeline to continue to report stages
                     // even when tests fail — build still marked UNSTABLE not SUCCESS
                     catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                        bat """
-                            mvn test ^
-                                -Dbrowser=${params.BROWSER} ^
-                                -Dheadless=${params.HEADLESS} ^
-                                -Dparallel.threads=${params.THREADS} ^
-                                ${tagFilter}
-                        """
+                       bat """
+                           mvn test ^
+                               -Denv=${params.ENV} ^
+                               -Dbrowser=${params.BROWSER} ^
+                               -Dheadless=${params.HEADLESS} ^
+                               -Dparallel.threads=${params.THREADS} ^
+                               ${tagFilter}
+                       """
                     }
                 }
             }

@@ -12,12 +12,15 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
 @ConfigurationParameter(
-        key = GLUE_PROPERTY_NAME,
+        key   = GLUE_PROPERTY_NAME,
         value = "com.company.automation"
 )
 @ConfigurationParameter(
-        key = PLUGIN_PROPERTY_NAME,
-        value = "pretty, summary, io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
+        key   = PLUGIN_PROPERTY_NAME,
+        value = "pretty,"
+                + "summary,"
+                + "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm,"
+                + "com.company.automation.retry.RetryPlugin"
 )
 public class RunCucumberTest {
 }

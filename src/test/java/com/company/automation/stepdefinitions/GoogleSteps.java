@@ -15,12 +15,15 @@ public class GoogleSteps {
         System.out.println("Base URL: " + ConfigReader.get("base.url"));
         googlePage.open(ConfigReader.get("base.url"));
 //
-//        String actualTitle = DriverManager.getDriver().getTitle();
-//
-//        Assertions.assertEquals(
-//                "Some Wrong Title",
-//                actualTitle,
-//                "Intentional mismatch to verify Allure reporting"
-//        );
+        String actualTitle = DriverManager.getDriver().getTitle();
+
+        Assertions.assertEquals(
+                "Some Wrong Title",
+                actualTitle,
+                "Intentional mismatch to verify Allure reporting"
+        );
+
+        // Temporarily break this to test retry
+//        Assertions.assertEquals("Wrong Title", driver.getTitle(), "Intentional failure");
     }
 }

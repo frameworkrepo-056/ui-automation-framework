@@ -22,6 +22,7 @@
         <allure.version>2.25.0</allure.version>
         <webdrivermanager.version>5.7.0</webdrivermanager.version>
         <log4j.version>2.22.1</log4j.version>
+        <env>dev</env>
         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
     </properties>
 
@@ -135,11 +136,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
-                <configuration>
 
+                <configuration>
                     <useModulePath>false</useModulePath>
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
+
+                    <!-- THIS is the retry — Surefire re-runs failed JUnit test methods up to N times -->
+                    <rerunFailingTestsCount>2</rerunFailingTestsCount>
 
                     <argLine>
                         -Xms512m -Xmx2048m
@@ -147,13 +151,6 @@
                         --add-opens java.base/java.util=ALL-UNNAMED
                     </argLine>
 
-                    <!--
-                        THE FIX: Only run via RunCucumberTest (@Suite runner).
-                        The raw Cucumber engine fires separately when cucumber.features
-                        is set as a system property — causing double execution.
-                        Locking Surefire to only the Suite class means one entry point,
-                        one ForkJoinPool, zero double runs — even with -Dcucumber.features.
-                    -->
                     <includes>
                         <include>**/RunCucumberTest.java</include>
                     </includes>
@@ -168,13 +165,14 @@
                     </properties>
 
                     <systemPropertyVariables>
-                        <allure.results.directory>
-                            ${project.build.directory}/allure-results
-                        </allure.results.directory>
+                        <env>${env}</env>
                         <parallel.threads>${parallel.threads}</parallel.threads>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
 
+                    <testFailureIgnore>false</testFailureIgnore>
                 </configuration>
+
             </plugin>
 
             <!-- Allure Maven Plugin -->

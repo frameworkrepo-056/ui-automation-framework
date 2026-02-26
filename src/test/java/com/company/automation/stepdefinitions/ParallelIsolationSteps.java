@@ -17,7 +17,7 @@ public class ParallelIsolationSteps {
     public void pageTitleShouldContain(String expected) {
         // Uses WaitUtils — consistent with rest of the framework
         WaitUtils.waitForTitleContains(DriverManager.getDriver(), expected);
-        
+
         String actualTitle = DriverManager.getDriver().getTitle();
         System.out.printf(
                 "[TITLE CHECK] Thread: %s | Expected: %s | Actual: %s%n",
